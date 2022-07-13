@@ -1,0 +1,8 @@
+TASKS
+1. configure/server/main.yml - configure ec2 instance for backend
+2. ansible/roles/deploy/tasls/main.yml
+3. 
+
+
+- circleci/files - has cloudformation templates
+- 
