@@ -8,7 +8,6 @@ commands:
           name: install AWS CLI V2
           command: |
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            yum install -y unzip
             unzip awscliv2.zip
             sudo ./aws/install
   install_ansible:
@@ -205,12 +204,11 @@ jobs:
       - run:
           name: Configure infrastructure
           command: |
-            yum install -y tar gzip
             cd .circleci/ansible
             cat .circleci/ansible/inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
-      - attach_workspace:
-          at: ~/
+      # - attach_workspace:
+      #     at: ~/
       - destroy-environment          
 
 #   run-migrations:
