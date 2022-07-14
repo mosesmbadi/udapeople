@@ -20,6 +20,13 @@ commands:
             sudo apt install software-properties-common -y
             sudo add-apt-repository --yes --update ppa:ansible/ansible
             sudo apt install ansible -y
+  install_tar_gzip:    
+    description: install tar
+    steps:
+      - run:     
+          name: install-tar-gzip
+          command: | 
+            yum install -y tar gzip                     
   install-nodejs:    
     description: install-node.js.13 
     steps:
@@ -203,13 +210,10 @@ jobs:
       - install_awscli
       - install_ansible
       - run:
-          name: Install dependencies
-          command: |
-            yum install -y tar gzip
-      - run:
           name: Configure infrastructure
           command: |
             cd .circleci/ansible
+            yum install -y tar gzip
             cat .circleci/ansible/inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
       - destroy-environment          
