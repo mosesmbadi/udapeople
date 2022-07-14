@@ -1,33 +1,49 @@
 version: 2.1
 
 commands:
+  install_awscli:
+    description: install AWS CLI V2
+    steps:
+      - run: 
+          name: install AWS CLI V2
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+  install_ansible:
+    description: Install Ansible
+    steps:
+      - run:     
+          name: Install Ansible
+          command: |
+            sudo apt update
+            sudo apt install software-properties-common -y
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible -y
+  install-nodejs:    
+    description: install-node.js.13 
+    steps:
+      - run:     
+          name: install-node.js.13
+          command: | 
+            curl fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+            sudo apt install -y nodejs                             
   destroy-environment:
-    description: Destroy all cloudformation stacks given a workflow ID.
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+    parameters:
+      Workflow_ID:
+        type: string
+        default: ${CIRCLE_WORKFLOW_ID:0:7}
     steps:
       - run:
-          name: Delete all files in the current S3 bucket
-          command: |
-            if aws s3api head-bucket --bucket udapeople-s3bucket-${CIRCLE_WORKFLOW_ID}
-            then
-              aws s3 rm s3://udapeople-s3bucket-${CIRCLE_WORKFLOW_ID}/ --recursive
-            fi
+          name: Destroy environments
           when: on_fail
-      - run:
-          name: Delete the current AWS CloudFormation stacks
           command: |
-            if aws cloudformation wait stack-exists --stack-name udapeople-cloudfront
-            then 
-              aws cloudformation delete-stack --stack-name udapeople-cloudfront
-            fi
-            if aws cloudformation wait stack-exists --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID}
-            then 
-              aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID}
-            fi
-            if aws cloudformation wait stack-exists --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID}
-            then
-              aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID}
-            fi
-          when: on_fail
+            aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.Workflow_ID >>
+            aws s3 rm s3://udapeople-<<parameters.Workflow_ID>> --recursive
+            aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.Workflow_ID >>
+
+
 
 #   revert-migrations:
 #     description: Revert the last migration if successfully run in the current workflow.
@@ -173,37 +189,30 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt     
-      - destroy-environment
-      
-      # - run:
-      #     name: Add back-end ip to ansible inventory
-      #     command: |
-      #       # Your code here
-      #       exit 1
-      # - persist_to_workspace:
-      #     root: ~/
-      #     paths:
-      #       - project/.circleci/ansible/inventory.txt
-      # # Here's where you will add some code to rollback on failure      
+      - destroy-environment     
 
-#   configure-infrastructure:
-#     docker:
-#       # Docker image here that supports Ansible
-#     steps:
-#       # Checkout code from git
-#       # Add ssh keys with fingerprint
-#       # attach workspace
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # Your code here
-#             exit 1
-#       - run:
-#           name: Configure server
-#           command: |
-#             # Your code here
-#             exit 1
-#       # Here's where you will add some code to rollback on failure      
+  configure-infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["a4:5f:2e:81:a0:a9:3b:8b:4b:c4:9a:93:ca:4d:fa:1d"]
+      - attach_workspace:
+          at: ~/
+      - install_awscli
+      - install_ansible
+      - run:
+          name: Install dependencies
+          command: |
+            yum install -y tar gzip
+      - run:
+          name: Configure infrastructure
+          command: |
+            cd .circleci/ansible
+            cat .circleci/ansible/inventory.txt
+            ansible-playbook -i inventory.txt configure-server.yml
+      - destroy-environment          
 
 #   run-migrations:
 #     docker:
