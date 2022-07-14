@@ -201,8 +201,6 @@ jobs:
       - install_ansible
       - add_ssh_keys:
           fingerprints: ["a4:5f:2e:81:a0:a9:3b:8b:4b:c4:9a:93:ca:4d:fa:1d"]
-      - attach_workspace:
-          at: ~/
       - run:
           name: Configure infrastructure
           command: |
@@ -210,6 +208,8 @@ jobs:
             cd .circleci/ansible
             cat .circleci/ansible/inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
+      - attach_workspace:
+          at: ~/
       - destroy-environment          
 
 #   run-migrations:
