@@ -1,17 +1,33 @@
 version: 2.1
 
-# commands:
-#   destroy-environment:
-#     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-#     parameters:
-#       # Add parameter here   
-#     steps:
-#       - run:
-#           name: Destroy environments
-#           when: on_fail
-#           command: |
-#             # Your code here
-#             exit 1
+commands:
+  destroy-environment:
+    description: Destroy all cloudformation stacks given a workflow ID.
+    steps:
+      - run:
+          name: Delete all files in the current S3 bucket
+          command: |
+            if aws s3api head-bucket --bucket udapeople-s3bucket-${CIRCLE_WORKFLOW_ID}
+            then
+              aws s3 rm s3://udapeople-s3bucket-${CIRCLE_WORKFLOW_ID}/ --recursive
+            fi
+          when: on_fail
+      - run:
+          name: Delete the current AWS CloudFormation stacks
+          command: |
+            if aws cloudformation wait stack-exists --stack-name udapeople-cloudfront
+            then 
+              aws cloudformation delete-stack --stack-name udapeople-cloudfront
+            fi
+            if aws cloudformation wait stack-exists --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID}
+            then 
+              aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID}
+            fi
+            if aws cloudformation wait stack-exists --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID}
+            then
+              aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID}
+            fi
+          when: on_fail
 
 #   revert-migrations:
 #     description: Revert the last migration if successfully run in the current workflow.
@@ -123,6 +139,7 @@ jobs:
             cd backend
             npm install
             npm audit fix --force
+ #           npm audit --audit-level=critical
 
 #   deploy-infrastructure:
 #     docker:
