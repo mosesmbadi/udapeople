@@ -250,46 +250,35 @@ jobs:
   # Deploy phase
   run-migrations:
     docker:
-      # Docker image here that supports NodeJS
-      - image: python:3.7-alpine3.11
+      - image: circleci/node:13.8.0
     steps:
       - checkout
-      - run:
-          name: 'install tar utility'
-          command: |
-            yum install -y tar gzip
-      - add_ssh_keys:
-          fingerprints: ["a4:5f:2e:81:a0:a9:3b:8b:4b:c4:9a:93:ca:4d:fa:1d"]
-      - attach_workspace:
-          at: ~/
+      
       - restore_cache:
           keys: [backend-build]
       - run:
-          name: Install dependencies
-          command: |
-            apk add --update nodejs npm curl
-            pip install awscli
-      - run:
           name: Run migrations
           command: |
-            cd backend
-            npm rebuild node-sass 
-            npm install
-            npm audit fix --audit-level=critical --force
-            npm run migrations > migrations_dump.txt
-            cat migrations_dump.txt
-      # - run:
-      #     name: Send migration results to kvdb.io
-      #     command: |
-      #       if grep -q "has been successfully." ~/project/backend/migrations_dump.txt
-      #       then
-      #         curl https://kvdb.io/BrJTpX6WsfB8eeSQiG5vvF/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
-      #       fi
-
-      - revert-migrations:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}    
+             cd  backend
+             npm run migrations:revert
+             npm run migrations > migrations_dump.txt
+      - run:
+          name: Send migration results to kvdB
+          command: |
+            if grep -q "has been executed successfully" ~/project/backend/migrations_dump.txt
+            then
+              echo "DB migration was successful, will update kvdb..."
+              curl -k https://kvdb.io/BrJTpX6WsfB8eeSQiG5vvF/udacity -d 'success'
+            else
+              echo "DB migration failed, please verify setup! Probably the database already exists. Verify setup!"
+              curl -k https://kvdb.io/BrJTpX6WsfB8eeSQiG5vvF/udacity -d 'failure'
+            fi
+            echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:5}"
+      
+      - destroy_environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:5}
+      - revert_migrations:
+          id: ${CIRCLE_WORKFLOW_ID:0:5}
 
 #   deploy-frontend:
 #     docker:
