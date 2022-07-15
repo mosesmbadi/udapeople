@@ -273,12 +273,12 @@ jobs:
               echo "DB migration failed, please verify setup! Probably the database already exists. Verify setup!"
               curl -k https://kvdb.io/BrJTpX6WsfB8eeSQiG5vvF/udacity -d 'failure'
             fi
-            echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:5}"
+            echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:7}"
       
       - destroy-environment:
-          id: ${CIRCLE_WORKFLOW_ID:0:5}
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations:
-          id: ${CIRCLE_WORKFLOW_ID:0:5}
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
 
 #   deploy-frontend:
 #     docker:
