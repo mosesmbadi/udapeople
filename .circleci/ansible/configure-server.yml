@@ -21,7 +21,8 @@
         name: python3
         state: latest
         update_cache: yes
-        
+
+ 
   environment:
     - TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION')}}"
     - TYPEORM_ENTITIES: "{{ lookup('env', 'TYPEORM_ENTITIES')}}"
