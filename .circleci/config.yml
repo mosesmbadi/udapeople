@@ -266,6 +266,7 @@ jobs:
           command: |
             cd backend
             npm cache clean --force
+            npm install --update-binary --no-shrinkwrap
             npm install
             npm run migrations > migrations_dump.txt
             cat migrations_dump.txt
