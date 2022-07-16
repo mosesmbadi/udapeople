@@ -221,7 +221,7 @@ jobs:
       #       if grep -q "has been executed successfully" ~/project/backend/migrations_dump.txt
       #       then
       #         echo "DB migration was successful, will update kvdb..."
-      #         curl -k https://kvdb.io/NnowyGhYzJyAAsC8uqaBvW/udacity -d 'success'
+      #         curl -k https://kvdb.io/NnowyGhYzsJyAAsC8uqaBvW/udacity -d 'success'
       #       else
       #         echo "DB migration failed, please verify setup! Probably the database already exists. Verify setup!"
       #         curl -k https://kvdb.io/NnowyGhYzJyAAsC8uqaBvW/udacity -d 'failure'
