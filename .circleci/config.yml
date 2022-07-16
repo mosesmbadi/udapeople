@@ -30,15 +30,9 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS=$(curl --insecure https://BrJTpX6WsfB8eeSQiG5vvF/migration_<< parameters.workflow_id >>)
-            echo $SUCCESS
-            if(( $SUCCESS==1 )); 
-            then
               cd ~/project/backend
               npm install
               npm run migration:revert
-            fi
 
 jobs:
   
@@ -213,6 +207,7 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update nodejs npm curl
+            # apk --no-cache add py-pip
             pip install awscli
       - run:
           name: Run migrations
@@ -228,7 +223,7 @@ jobs:
       #       then
       #         curl https://kvdb.io/BrJTpX6WsfB8eeSQiG5vvF/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
       #       fi
-      
+
       - revert-migrations:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - destroy-environment:
