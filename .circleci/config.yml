@@ -228,10 +228,10 @@ jobs:
       #       fi
       #       echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:5}"
       
-      - destroy_environment:
-          id: ${CIRCLE_WORKFLOW_ID:0:5}
-      - revert_migrations:
-          id: ${CIRCLE_WORKFLOW_ID:0:5}
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:5}
+      - revert-migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:5}
   
   deploy-frontend:
     docker:
