@@ -204,10 +204,10 @@ jobs:
   # Deploy phase
   run-migrations:
     docker:
-      # # # Docker image here that supports NodeJS
-      # # - image: python:3.7-alpine3.11
-      #   - image: circleci/node:13.8.0
-        - image: amazon/aws-cli
+      # # # # Docker image here that supports NodeJS
+       - image: python:3.7-alpine3.11
+      # #   - image: circleci/node:13.8.0
+      #   - image: amazon/aws-cli
     steps:
       - checkout
       - restore_cache:
