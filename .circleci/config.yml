@@ -132,10 +132,10 @@ jobs:
             cd backend
             npm install
             npm audit fix --audit-level=critical --force
-      # - slack/notify:
-      #     channel: C03K89TRV4Z
-      #     event: fail
-      #     template: basic_fail_1
+      - slack/notify:
+          channel: C03PAJMA6GZ
+          event: fail
+          template: basic_fail_1
 
   deploy-infrastructure:
     docker:
