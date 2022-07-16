@@ -204,9 +204,9 @@ jobs:
   # Deploy phase
   run-migrations:
     docker:
-      # # # # Docker image here that supports NodeJS
-       - image: python:3.7-alpine3.11
-      # #   - image: circleci/node:13.8.0
+      # # # # # Docker image here that supports NodeJS
+      #  - image: python:3.7-alpine3.11
+      - image: circleci/node:13.8.0
       #   - image: amazon/aws-cli
     steps:
       - checkout
@@ -215,7 +215,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update nodejs npm curl
+            apt-get add --update nodejs npm curl
             pip install awscli
       - run:
           name: Run migrations
