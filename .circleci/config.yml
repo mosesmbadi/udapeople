@@ -396,40 +396,40 @@ jobs:
             if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
             then
               echo "--Delete confirmed--"
-              aws s3 rm "s3://$udapeople-{OldWorkflowID}" --recursive
-              aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-              aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
+              aws s3 rm "s3://$udapeople-{OldWorkflowID}" --recursive ||true
+              aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}" ||true
+              aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}" ||true
             else
               echo --------cannot remove stacks ---------
             fi
 
-  # add-prometheus-node-exporter:
-  #   docker:
-  #     - image: python:3.7-alpine3.11
-  #   steps:
-  #     - checkout
-  #     - add_ssh_keys:
-  #         fingerprints: ["a4:5f:2e:81:a0:a9:3b:8b:4b:c4:9a:93:ca:4d:fa:1d"]
-  #     - run:
-  #         name: install dependencies
-  #         command: |
-  #           apk add --update tar gzip ansible nodejs npm
-  #           pip install awscli
-  #     - restore_cache:
-  #         keys: [backend-build]
-  #     - attach_workspace:
-  #         at: ~/
-  #     - run:
-  #         name: Setup Prometheus Node Exporter
-  #         command: |
-  #           cd .circleci/ansible
-  #           cat inventory.txt
-  #           ansible-playbook -i inventory.txt node-exporter.yml
-  #     # Here's where you will add some code to rollback on failure
-  #     - destroy-environment:
-  #         workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-  #     - revert-migrations:
-  #         workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+  add-prometheus-node-exporter:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["a4:5f:2e:81:a0:a9:3b:8b:4b:c4:9a:93:ca:4d:fa:1d"]
+      - run:
+          name: install dependencies
+          command: |
+            apk add --update tar gzip ansible nodejs npm
+            pip install awscli
+      - restore_cache:
+          keys: [backend-build]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Setup Prometheus Node Exporter
+          command: |
+            cd .circleci/ansible
+            cat inventory.txt
+            ansible-playbook -i inventory.txt node-exporter.yml
+      # Here's where you will add some code to rollback on failure
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
 
 workflows:
@@ -466,5 +466,5 @@ workflows:
           requires: [smoke-test]
       - cleanup:
           requires: [cloudfront-update]
-      # - add-prometheus-node-exporter:
-      #     requires: [cloudfront-update]
+      - add-prometheus-node-exporter:
+          requires: [cloudfront-update]
