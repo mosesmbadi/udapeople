@@ -1,2 +1,2 @@
 URL01: https://github.com/mosesmbadi/udapeople
-URL02: http://udapeople-94ed142.s3-website-us-east-1.amazonaws.com/#/employees
+URL02: http://udapeople-f5e6930.s3-website-us-east-1.amazonaws.com/#/employees
